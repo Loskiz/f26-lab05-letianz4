@@ -11,41 +11,39 @@ Three smells, each in a different part of the module. For each one, fill in all 
 
 ### Smell 1
 
-**The smell.** Name it, using the vocabulary from lecture.
+**The smell.** Feature Envy (classic)
 
-**Classic or agent-specific.** Which, and why that label. For agent-specific, say which of
-the lecture's three causes produced it.
+**Classic or agent-specific.** Classic
 
-**Where in the code.** File and, where there is one, method.
+**Where in the code.** `resevationManager.ts` createBooking
 
-**The principle it violates.** Name the principle. "This is too big" is not a principle.
+**The principle it violates.** It violates the Information Expert princeple where the behavior should be enforced near the data
 
-**What it makes expensive.** A concrete future change, or something that already goes wrong
-today. What breaks first?
+**What it makes expensive.** Let us say we introduce another booking related function in ReservationManager, the same behavior enforcement need to be preplicated and not just live in one place instead. 
 
 ### Smell 2
 
-**The smell.**
+**The smell.** God Class
 
-**Classic or agent-specific.**
+**Classic or agent-specific.** Classic
 
-**Where in the code.**
+**Where in the code.** `reservationManager.ts` below calculate price
 
-**The principle it violates.**
+**The principle it violates.** Cohesion
 
-**What it makes expensive.**
+**What it makes expensive.** changing one thing about discount population potentially require us to reason about how the change propagates in the whole Reservation manager class, we might also have to run the entire test suite for it as well
 
 ### Smell 3
 
-**The smell.**
+**The smell.** Speculative over-abstraction.
 
-**Classic or agent-specific.**
+**Classic or agent-specific.** Agent-specific; an underspecified request may have led to a plugin-style design without a need for multiple channels.
 
-**Where in the code.**
+**Where in the code.** `src/notifications/notifierFactory.ts`: `registerChannel`, `registeredChannels`, and `createNotificationChannel`. The only registered channel is `email`.
 
-**The principle it violates.**
+**The principle it violates.** YAGNI: add an abstraction when there is a concrete variation it needs to support.
 
-**What it makes expensive.**
+**What it makes expensive.** Changing how the sole email channel is constructed requires tracing the config, mutable registry, factory, and `EmailChannel` instead of one construction path. The two default sender addresses can also drift.
 
 ---
 

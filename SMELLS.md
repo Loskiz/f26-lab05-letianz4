@@ -67,24 +67,24 @@ One proposal for each milestone 1 smell you did not fix.
 
 ### Proposal A (not coded)
 
-**The problem.** Name it.
+**The problem.** `ReservationManager.createBooking` decides room availability itself: it ignores cancelled bookings and compares each confirmed booking's time window with the requested window.
 
-**The decomposition.** What are the pieces, what does each own, and where do the rules live?
+**The decomposition.** Make `Room` a domain object that owns its current booking schedule. Put the confirmed-booking filter and overlap rule in `Room.findConflictingBooking(start, end): Booking | undefined`; have room slot searches use the same rule. `ReservationManager` asks the room for a conflict, formats the error if there is one, and coordinates persistence. Storage persists bookings but does not decide availability.
 
-**One cost.** Something this actually costs. "No real downside" is not a cost.
+**One cost.** `Room` is currently only an interface, while storage owns the bookings. Giving each room a schedule requires loading it from storage and keeping it current when bookings are created or cancelled; otherwise availability can become stale.
 
 ### Proposal B (not coded)
 
-**The problem.**
+**The problem.** `ReservationManager` coordinates booking creation and cancellation while also owning pricing and discount rules (`calculatePrice`, `applyDiscounts`) and receipt and summary formatting (`formatReceipt`, `formatDailySummary`). Those are separate reasons to change, so the class has low cohesion.
 
-**The decomposition.**
+**The decomposition.** Create a `BookingPricer` to own rates, the premium surcharge, and discounts, and a `BookingFormatter` to own receipt and daily-summary text, including clock and money formatting. `ReservationManager` stays the workflow coordinator: it passes room and time data to the pricer and room and booking data to the formatter, while its existing public methods delegate to them. `ReportGenerator` should use the same pricer instead of maintaining its own copy of the pricing rules.
 
-**One cost.**
+**One cost.** The manager and report generator would need to construct or receive these collaborators and pass them the right data. That adds dependency wiring and makes setup more involved.
 
 ### The thing that looks smelly but is fine
 
-**What it is.** File and method.
+**What it is.** `StorageProvider` in `src/storage/storageProvider.ts` and its only implementation, `InMemoryStorageProvider` in `src/storage/inMemoryStorageProvider.ts`, might look like speculative over-abstraction.
 
-**Why it is fine.** Defend it with properties of the code, not with its line count.
+**Why it is fine.** The boundary already has a purpose: `ReservationManager` and `ReportGenerator` use the storage operations without depending on the `Map`. The in-memory provider hides that data structure, so it can change internally; a different provider could also replace it without changing booking and reporting logic.
 
-**What would flip your verdict.** Name the change that would turn this into a real problem.
+**What would flip your verdict.** Adding a provider registry or factory for hypothetical storage backends before another backend is needed would add extension machinery with no current use.

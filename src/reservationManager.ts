@@ -2,7 +2,7 @@ import { findFreeSlots } from './availability';
 import { DEFAULT_CACHE_CONFIG } from './cache/cacheConfig';
 import { QueryCache } from './cache/queryCache';
 import type { NotificationChannel } from './notifications/channel';
-import { createNotificationChannel, DEFAULT_NOTIFIER_CONFIG } from './notifications/notifierFactory';
+import { EmailChannel } from './notifications/emailChannel';
 import { InMemoryStorageProvider } from './storage/inMemoryStorageProvider';
 import type { StorageProvider } from './storage/storageProvider';
 import type { Booking, ReservationRequest, Room } from './types';
@@ -37,7 +37,7 @@ export class ReservationManager {
 
   constructor(storage: StorageProvider = new InMemoryStorageProvider()) {
     this.storage = storage;
-    this.notifier = createNotificationChannel(DEFAULT_NOTIFIER_CONFIG);
+    this.notifier = new EmailChannel();
     this.cache = new QueryCache(DEFAULT_CACHE_CONFIG);
   }
 

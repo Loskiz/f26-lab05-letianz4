@@ -51,15 +51,13 @@ Three smells, each in a different part of the module. For each one, fill in all 
 
 One fix, behavior preserved, suite green, zero test edits.
 
-**Which smell you attacked.** And why that one.
+**Which smell you attacked.** Smell 3, speculative over-abstraction. Email is the only channel, so removing the unused plugin registry is a small, complete fix.
 
-**What changed.** Files and methods you touched, and what the code does differently now.
+**What changed.** `ReservationManager` now constructs `EmailChannel` directly. I removed `src/notifications/notifierFactory.ts`, including its registry, config, and duplicate default sender address, and updated the stale comment on `NotificationChannel.name`.
 
-**What you deliberately did not touch.** Name the scope line you drew and why you drew it
-there. "I ran out of time" is not a scope line.
+**What you deliberately did not touch.** I kept `EmailChannel.send`, the `NotificationChannel` interface, `ReservationManager.dispatchNotification`, and receipt formatting unchanged. The smell is limited to the unused construction registry.
 
-**How you know behavior is preserved.** Point at the suite, say what it actually covers, and
-say what it would not catch.
+**How you know behavior is preserved.** After `npm ci`, all 39 tests passed and `npm run typecheck` passed. A temporary smoke check confirmed that booking and cancellation still log `email` notifications with the same recipient, subjects, and default sender address. The suite exercises those flows but does not assert notification text; the smoke check covers that representative case. No tests were edited.
 
 ---
 

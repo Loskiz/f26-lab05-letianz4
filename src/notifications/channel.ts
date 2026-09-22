@@ -8,7 +8,7 @@ export interface NotificationResult {
 
 /** A way to get a message to a person. */
 export interface NotificationChannel {
-  /** Stable identifier used by the factory registry. */
+  /** Stable identifier included in the result of a send attempt. */
   readonly name: string;
 
   /** Delivers one message and reports what happened. */
